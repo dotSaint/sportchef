@@ -1,10 +1,11 @@
 package ch.sportchef.server.resources;
 
-import ch.sportchef.server.App;
 import ch.sportchef.server.representations.License;
 import ch.sportchef.server.services.LicenseService;
+import ch.sportchef.server.services.ServiceRegistry;
 import com.codahale.metrics.annotation.Timed;
 
+import javax.management.ServiceNotFoundException;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
@@ -15,8 +16,8 @@ public class LicenseResource {
 
     private final LicenseService licenseService;
 
-    public LicenseResource() {
-        this.licenseService = App.getService(LicenseService.class);
+    public LicenseResource() throws ServiceNotFoundException {
+        this.licenseService = ServiceRegistry.getService(LicenseService.class);
     }
 
     @GET

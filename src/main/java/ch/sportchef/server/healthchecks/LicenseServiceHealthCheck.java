@@ -1,16 +1,18 @@
 package ch.sportchef.server.healthchecks;
 
-import ch.sportchef.server.App;
 import ch.sportchef.server.representations.License;
 import ch.sportchef.server.services.LicenseService;
+import ch.sportchef.server.services.ServiceRegistry;
 import com.codahale.metrics.health.HealthCheck;
+
+import javax.management.ServiceNotFoundException;
 
 public class LicenseServiceHealthCheck extends HealthCheck {
 
     private final LicenseService licenseService;
 
-    public LicenseServiceHealthCheck() {
-        this.licenseService = App.getService(LicenseService.class);
+    public LicenseServiceHealthCheck() throws ServiceNotFoundException {
+        this.licenseService = ServiceRegistry.getService(LicenseService.class);
     }
 
     @Override

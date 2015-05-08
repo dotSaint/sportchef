@@ -3,6 +3,7 @@ package ch.sportchef.server.healthcheck;
 import ch.sportchef.server.App;
 import ch.sportchef.server.configuration.SportChefConfiguration;
 import ch.sportchef.server.representations.User;
+import ch.sportchef.server.services.ServiceRegistry;
 import ch.sportchef.server.services.UserService;
 import ch.sportchef.server.utils.UserGenerator;
 import io.dropwizard.testing.junit.DropwizardAppRule;
@@ -11,6 +12,7 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 
+import javax.management.ServiceNotFoundException;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
@@ -26,8 +28,8 @@ public class UserServiceHealthCheckShould {
     public static final DropwizardAppRule<SportChefConfiguration> RULE = new DropwizardAppRule<>(App.class, "config-test.yaml");
 
     @BeforeClass
-    public static void setup() throws SQLException, LiquibaseException {
-        final UserService userService = App.getService(UserService.class);
+    public static void setup() throws SQLException, LiquibaseException, ServiceNotFoundException {
+        final UserService userService = ServiceRegistry.getService(UserService.class);
         userService.storeUser(UserGenerator.getJohnDoe(0L));
     }
 
@@ -48,8 +50,8 @@ public class UserServiceHealthCheckShould {
     }
 
     @Test
-    public void returnUnhealthy() throws IOException {
-        final UserService userService = App.getService(UserService.class);
+    public void returnUnhealthy() throws IOException, ServiceNotFoundException {
+        final UserService userService = ServiceRegistry.getService(UserService.class);
         final User user = userService.readUserById(1L).get();
         userService.removeUser(user);
 

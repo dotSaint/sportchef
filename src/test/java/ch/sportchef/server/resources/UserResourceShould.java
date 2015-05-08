@@ -3,6 +3,7 @@ package ch.sportchef.server.resources;
 import ch.sportchef.server.App;
 import ch.sportchef.server.configuration.SportChefConfiguration;
 import ch.sportchef.server.representations.User;
+import ch.sportchef.server.services.ServiceRegistry;
 import ch.sportchef.server.services.UserService;
 import ch.sportchef.server.utils.UserGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -12,6 +13,7 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 
+import javax.management.ServiceNotFoundException;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
@@ -28,8 +30,8 @@ public class UserResourceShould {
     public static final DropwizardAppRule<SportChefConfiguration> RULE = new DropwizardAppRule<>(App.class, "config-test.yaml");
 
     @BeforeClass
-    public static void setup() throws SQLException, LiquibaseException {
-        final UserService userService = App.getService(UserService.class);
+    public static void setup() throws SQLException, LiquibaseException, ServiceNotFoundException {
+        final UserService userService = ServiceRegistry.getService(UserService.class);
         johnDoe = userService.storeUser(UserGenerator.getJohnDoe(0L));
         janeDoe = userService.storeUser(UserGenerator.getJaneDoe(0L));
         joyDoe = userService.storeUser(UserGenerator.getJoyDoe(0L));

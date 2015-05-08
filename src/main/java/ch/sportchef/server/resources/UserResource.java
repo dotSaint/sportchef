@@ -1,10 +1,11 @@
 package ch.sportchef.server.resources;
 
-import ch.sportchef.server.App;
 import ch.sportchef.server.representations.User;
+import ch.sportchef.server.services.ServiceRegistry;
 import ch.sportchef.server.services.UserService;
 import com.codahale.metrics.annotation.Timed;
 
+import javax.management.ServiceNotFoundException;
 import javax.validation.Valid;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -21,8 +22,8 @@ public class UserResource {
 
     private final UserService userService;
 
-    public UserResource() {
-        this.userService = App.getService(UserService.class);
+    public UserResource() throws ServiceNotFoundException {
+        this.userService = ServiceRegistry.getService(UserService.class);
     }
 
     @GET

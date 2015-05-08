@@ -6,6 +6,7 @@ import ch.sportchef.server.configuration.SportChefDataSourceFactory;
 import ch.sportchef.server.configuration.UserServiceConfiguration;
 import ch.sportchef.server.dao.UserDAO;
 import ch.sportchef.server.services.LicenseService;
+import ch.sportchef.server.services.ServiceRegistry;
 import ch.sportchef.server.services.UserService;
 import ch.sportchef.server.utils.UserGenerator;
 import com.codahale.metrics.health.HealthCheck;
@@ -86,8 +87,8 @@ public class AppShould {
 
         new App().run(configuration, environment);
 
-        assertThat(App.getService(LicenseService.class)).isNotNull();
-        assertThat(App.getService(UserService.class)).isNotNull();
+        assertThat(ServiceRegistry.getService(LicenseService.class)).isNotNull();
+        assertThat(ServiceRegistry.getService(UserService.class)).isNotNull();
 
         verify(healthCheckRegistry, times(2)).register(anyString(), any(HealthCheck.class));
         verify(jerseyEnvironment, times(2)).register(any(Object.class));

@@ -8,7 +8,7 @@ import ch.sportchef.server.healthchecks.UserServiceHealthCheck;
 import ch.sportchef.server.resources.LicenseResource;
 import ch.sportchef.server.resources.UserResource;
 import ch.sportchef.server.services.LicenseService;
-import ch.sportchef.server.services.Service;
+import ch.sportchef.server.services.ServiceRegistry;
 import ch.sportchef.server.services.UserService;
 import ch.sportchef.server.utils.LiquibaseUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,22 +23,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-import java.util.HashMap;
-import java.util.Map;
 
 public class App extends Application<SportChefConfiguration> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(App.class);
 
-    private static final Map<String, Service> services = new HashMap<>();
-
     public static void main(@Nonnull final String[] args) throws Exception {
         LOGGER.info("Starting application with arguments: %s", new Object[]{args});
         new App().run(args);
-    }
-
-    public static <T extends Service> T getService(Class<T> serviceClass) {
-        return serviceClass.cast(services.get(serviceClass.getName()));
     }
 
     @Override
@@ -69,9 +61,9 @@ public class App extends Application<SportChefConfiguration> {
         // Prepare data access objects
         final UserDAO userDAO = dbi.onDemand(UserDAO.class);
 
-        // Initialize services
-        services.put(LicenseService.class.getName(), new LicenseService());
-        services.put(UserService.class.getName(), new UserService(userDAO));
+        // Register services
+        ServiceRegistry.register(new LicenseService());
+        ServiceRegistry.register(new UserService(userDAO));
 
         // Initialize health checks
         environment.healthChecks().register("licenseService", new LicenseServiceHealthCheck());
