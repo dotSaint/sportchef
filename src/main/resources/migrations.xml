@@ -8,7 +8,7 @@
 
     <changeSet id="1" author="McPringle">
         <createTable tableName="user">
-            <column name="id" type="bigint" autoIncrement="true">
+            <column name="userId" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="firstName" type="varchar(100)">
@@ -22,6 +22,9 @@
             </column>
             <column name="email" type="varchar(100)">
                 <constraints nullable="false"/>
+            </column>
+            <column name="password" type="varchar(128)">
+                <constraints nullable="true"/>
             </column>
         </createTable>
     </changeSet>

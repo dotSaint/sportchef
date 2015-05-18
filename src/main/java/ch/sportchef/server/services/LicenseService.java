@@ -3,6 +3,7 @@ package ch.sportchef.server.services;
 import ch.sportchef.server.representations.License;
 import com.google.common.base.Charsets;
 
+import javax.ws.rs.NotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -20,8 +21,8 @@ public class LicenseService implements Service {
                     text,
                     "https://www.gnu.org/licenses/agpl-3.0.html");
             return license;
-        } catch (final IOException ioe) {
-            return null;
+        } catch (final IOException e) {
+            throw new NotFoundException(e);
         }
     }
 }

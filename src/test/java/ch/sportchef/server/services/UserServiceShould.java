@@ -7,7 +7,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Optional;
+import javax.ws.rs.NotFoundException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -22,10 +24,17 @@ public class UserServiceShould {
 
     @Before
     public void setUp() {
+        final User johnDoe = UserGenerator.getJohnDoe(1L);
+        final User janeDoe = UserGenerator.getJaneDoe(2L);
+
         // mock DAO
         userDAO = mock(UserDAO.class);
-        when(userDAO.readById(1L)).thenReturn(UserGenerator.getJohnDoe(1L));
-        when(userDAO.readById(2L)).thenReturn(UserGenerator.getJaneDoe(2L));
+        when(userDAO.readAllUsers()).thenReturn(new ArrayList<User>() {{
+            add(johnDoe);
+            add(janeDoe);
+        }});
+        when(userDAO.readById(1L)).thenReturn(johnDoe);
+        when(userDAO.readById(2L)).thenReturn(janeDoe);
         when(userDAO.readById(3L)).thenReturn(null);
 
         // initialise service
@@ -39,23 +48,28 @@ public class UserServiceShould {
     }
 
     @Test
+    public void returnAllUsers() {
+        final List<User> users = userService.readAllUsers();
+        assertThat(users.size()).isEqualTo(2);
+        assertThat(users.get(0)).isEqualTo(UserGenerator.getJohnDoe(1L));
+        assertThat(users.get(1)).isEqualTo(UserGenerator.getJaneDoe(2L));
+    }
+
+    @Test
     public void returnJohnDoe() {
-        final Optional<User> optionalUser = userService.readUserById(1L);
-        assertThat(optionalUser.isPresent()).isTrue();
-        assertThat(optionalUser.get()).isEqualTo(UserGenerator.getJohnDoe(1L));
+        final User user = userService.readUserById(1L);
+        assertThat(user).isEqualTo(UserGenerator.getJohnDoe(1L));
     }
 
     @Test
     public void returnJaneDoe() {
-        final Optional<User> optionalUser = userService.readUserById(2L);
-        assertThat(optionalUser.isPresent()).isTrue();
-        assertThat(optionalUser.get()).isEqualTo(UserGenerator.getJaneDoe(2L));
+        final User user = userService.readUserById(2L);
+        assertThat(user).isEqualTo(UserGenerator.getJaneDoe(2L));
     }
 
-    @Test
+    @Test(expected = NotFoundException.class)
     public void returnNoUser() {
-        final Optional<User> optionalUser = userService.readUserById(3L);
-        assertThat(optionalUser.isPresent()).isFalse();
+        userService.readUserById(3L);
     }
 
     @Test
@@ -76,6 +90,5 @@ public class UserServiceShould {
     public void removeNonExistingUser() {
         final User nonExistingUser = UserGenerator.getJimDoe(3L);
         userService.removeUser(nonExistingUser);
-        assertThat(userService.readUserById(3L).isPresent()).isFalse();
     }
 }

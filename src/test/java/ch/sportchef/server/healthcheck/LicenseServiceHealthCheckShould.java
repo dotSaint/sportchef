@@ -54,7 +54,7 @@ public class LicenseServiceHealthCheckShould {
             assertThat(response.getStatus()).isEqualTo(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
 
             final String body = response.readEntity(String.class);
-            assertThat(body).contains("LicenseService has problems returning the correct license!");
+            assertThat(body).contains("LicenseService could not find the license!");
         } finally {
             Files.move(movedLicenseFile, originalLicenseFile);
         }

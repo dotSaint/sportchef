@@ -27,8 +27,10 @@ logging:
 healthCheck:
   userService:
     referenceUser:
-      id: 1
+      userId: 1
       firstName: John
       lastName: Doe
       phone: +41 79 555 00 01
       email: john.doe@sportchef.ch
+
+tokenSecret: KzsrEwHRrrHyfXruyKcZTMDQkhxaRt

@@ -9,19 +9,24 @@ import org.skife.jdbi.v2.sqlobject.SqlQuery;
 import org.skife.jdbi.v2.sqlobject.SqlUpdate;
 import org.skife.jdbi.v2.sqlobject.customizers.RegisterMapper;
 
+import java.util.List;
+
 @RegisterMapper(UserMapper.class)
 public interface UserDAO {
 
     @GetGeneratedKeys
-    @SqlUpdate("INSERT INTO user (id, firstName, lastName, phone, email) VALUES (NULL, :firstName, :lastName, :phone, :email)")
+    @SqlUpdate("INSERT INTO user (userId, firstName, lastName, phone, email, password) VALUES (NULL, :firstName, :lastName, :phone, :email, :password)")
     long create(@BindBean User user);
 
-    @SqlQuery("SELECT * FROM user WHERE id = :id")
-    User readById(@Bind("id") final long id);
+    @SqlQuery("SELECT * FROM user ORDER BY userId")
+    List<User> readAllUsers();
 
-    @SqlUpdate("UPDATE user SET firstName = :firstName, lastName = :lastName, phone = :phone, email = :email WHERE id = :id")
+    @SqlQuery("SELECT * FROM user WHERE userId = :userId")
+    User readById(@Bind("userId") final long userId);
+
+    @SqlUpdate("UPDATE user SET firstName = :firstName, lastName = :lastName, phone = :phone, email = :email WHERE userId = :userId")
     void update(@BindBean User user);
 
-    @SqlUpdate("DELETE FROM user WHERE id = :id")
+    @SqlUpdate("DELETE FROM user WHERE userId = :userId")
     void delete(@BindBean User user);
 }

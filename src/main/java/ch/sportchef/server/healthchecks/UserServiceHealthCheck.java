@@ -7,7 +7,7 @@ import ch.sportchef.server.services.UserService;
 import com.codahale.metrics.health.HealthCheck;
 
 import javax.management.ServiceNotFoundException;
-import java.util.Optional;
+import javax.ws.rs.NotFoundException;
 
 public class UserServiceHealthCheck extends HealthCheck {
 
@@ -21,14 +21,18 @@ public class UserServiceHealthCheck extends HealthCheck {
     }
 
     @Override
-    protected Result check() throws Exception {
-        final long userId = referenceUser.getId();
-        final Optional<User> checkUser = userService.readUserById(userId);
+    protected Result check() {
+        final long userId = referenceUser.getUserId();
 
-        if (checkUser.isPresent() && checkUser.get().equals(referenceUser)) {
-            return Result.healthy("UserService is fine.");
+        try {
+            final User checkUser = userService.readUserById(userId);
+
+            if (checkUser.equals(referenceUser)) {
+                return Result.healthy("UserService is fine.");
+            }
+            return Result.unhealthy("UserService could not find the correct user with id '%d'!", userId);
+        } catch (final NotFoundException e) {
+            return Result.unhealthy("UserService could not find any user with id '%d'!", userId);
         }
-
-        return Result.unhealthy("UserService has problems returning the correct reference user!");
     }
 }

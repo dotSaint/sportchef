@@ -8,11 +8,12 @@ import ch.sportchef.server.services.UserService;
 import ch.sportchef.server.utils.UserGenerator;
 import io.dropwizard.testing.junit.DropwizardAppRule;
 import liquibase.exception.LiquibaseException;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 
 import javax.management.ServiceNotFoundException;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
@@ -24,17 +25,25 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class UserServiceHealthCheckShould {
 
+    private UserService userService;
+
     @ClassRule
     public static final DropwizardAppRule<SportChefConfiguration> RULE = new DropwizardAppRule<>(App.class, "config-test.yaml");
 
-    @BeforeClass
-    public static void setup() throws SQLException, LiquibaseException, ServiceNotFoundException {
-        final UserService userService = ServiceRegistry.getService(UserService.class);
-        userService.storeUser(UserGenerator.getJohnDoe(0L));
+    @Before
+    public void setup() throws SQLException, LiquibaseException, ServiceNotFoundException {
+        userService = ServiceRegistry.getService(UserService.class);
+        try {
+            userService.readUserById(1L);
+        } catch (final NotFoundException e) {
+            userService.storeUser(UserGenerator.getJohnDoe(0L));
+        }
     }
 
     @Test
     public void returnHealthy() throws IOException {
+        userService.storeUser(UserGenerator.getJohnDoe(1L));
+
         final WebTarget target = ClientBuilder.newClient().target(
                 String.format("http://localhost:%d/healthcheck", RULE.getAdminPort()));
 
@@ -50,9 +59,26 @@ public class UserServiceHealthCheckShould {
     }
 
     @Test
-    public void returnUnhealthy() throws IOException, ServiceNotFoundException {
-        final UserService userService = ServiceRegistry.getService(UserService.class);
-        final User user = userService.readUserById(1L).get();
+    public void returnNotCorrect() throws IOException, ServiceNotFoundException {
+        userService.storeUser(UserGenerator.getJaneDoe(1L));
+
+        final WebTarget target = ClientBuilder.newClient().target(
+                String.format("http://localhost:%d/healthcheck", RULE.getAdminPort()));
+
+        final Response response = target
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .accept(MediaType.APPLICATION_JSON_TYPE)
+                .get();
+
+        assertThat(response.getStatus()).isEqualTo(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
+
+        final String body = response.readEntity(String.class);
+        assertThat(body).contains("UserService could not find the correct user with id '1'!");
+    }
+
+    @Test
+    public void returnNotFound() throws IOException, ServiceNotFoundException {
+        final User user = userService.readUserById(1L);
         userService.removeUser(user);
 
         final WebTarget target = ClientBuilder.newClient().target(
@@ -66,6 +92,6 @@ public class UserServiceHealthCheckShould {
         assertThat(response.getStatus()).isEqualTo(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
 
         final String body = response.readEntity(String.class);
-        assertThat(body).contains("UserService has problems returning the correct reference user!");
+        assertThat(body).contains("UserService could not find any user with id '1'!");
     }
 }

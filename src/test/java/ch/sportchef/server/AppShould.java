@@ -11,6 +11,7 @@ import ch.sportchef.server.services.UserService;
 import ch.sportchef.server.utils.UserGenerator;
 import com.codahale.metrics.health.HealthCheck;
 import com.codahale.metrics.health.HealthCheckRegistry;
+import com.github.toastshaman.dropwizard.auth.jwt.hmac.HmacSHA512Verifier;
 import io.dropwizard.Bundle;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.jdbi.DBIFactory;
@@ -34,7 +35,7 @@ import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.whenNew;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(App.class)
+@PrepareForTest({App.class, ServiceRegistry.class})
 public class AppShould {
 
     @Test
@@ -85,12 +86,21 @@ public class AppShould {
         when(environment.jersey()).thenReturn(jerseyEnvironment);
         when(environment.metrics()).thenReturn(null);
 
+        final HmacSHA512Verifier hmacSHA512Verifier = mock(HmacSHA512Verifier.class);
+        whenNew(HmacSHA512Verifier.class).withAnyArguments().thenReturn(hmacSHA512Verifier);
+
+        /*
+        final UserService userService = Mockito.mock(UserService.class);
+        mockStatic(ServiceRegistry.class);
+        when(ServiceRegistry.getService(eq(UserService.class))).thenReturn(userService);
+        */
+
         new App().run(configuration, environment);
 
         assertThat(ServiceRegistry.getService(LicenseService.class)).isNotNull();
         assertThat(ServiceRegistry.getService(UserService.class)).isNotNull();
 
         verify(healthCheckRegistry, times(2)).register(anyString(), any(HealthCheck.class));
-        verify(jerseyEnvironment, times(2)).register(any(Object.class));
+        verify(jerseyEnvironment, times(5)).register(any(Object.class));
     }
 }

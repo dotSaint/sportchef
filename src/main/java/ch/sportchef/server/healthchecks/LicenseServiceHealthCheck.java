@@ -6,6 +6,7 @@ import ch.sportchef.server.services.ServiceRegistry;
 import com.codahale.metrics.health.HealthCheck;
 
 import javax.management.ServiceNotFoundException;
+import javax.ws.rs.NotFoundException;
 
 public class LicenseServiceHealthCheck extends HealthCheck {
 
@@ -17,12 +18,11 @@ public class LicenseServiceHealthCheck extends HealthCheck {
 
     @Override
     protected Result check() throws Exception {
-        final License license = licenseService.readLicense();
-
-        if (license != null) {
+        try {
+            licenseService.readLicense();
             return Result.healthy("LicenseService is fine.");
+        } catch (final NotFoundException e) {
+            return Result.unhealthy("LicenseService could not find the license!");
         }
-
-        return Result.unhealthy("LicenseService has problems returning the correct license!");
     }
 }

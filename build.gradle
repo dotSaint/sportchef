@@ -8,8 +8,9 @@ apply plugin: 'com.github.kt3k.coveralls'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-// Year and month
-version = '15.04'
+version = '0.1'
+
+mainClassName = 'ch.sportchef.server.App'
 
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
@@ -34,7 +35,10 @@ dependencies {
             'io.dropwizard:dropwizard-metrics:0.8.1',
             'io.dropwizard:dropwizard-migrations:0.8.1',
             'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.5.3',
-            'com.h2database:h2:1.4.187'
+            'com.h2database:h2:1.4.187',
+            'com.github.toastshaman:dropwizard-auth-jwt:0.8.1-0',
+            'com.auth0:java-jwt:2.0.1',
+            'commons-codec:commons-codec:1.10'
     )
     testCompile (
             'io.dropwizard:dropwizard-testing:0.8.1',

@@ -11,7 +11,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 
-@Path("/license")
+@Path("license")
 public class LicenseResource {
 
     private final LicenseService licenseService;
@@ -24,9 +24,6 @@ public class LicenseResource {
     @Timed
     public Response readLicense() throws IOException {
         final License license = licenseService.readLicense();
-        if (license == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
         return Response.ok(license).build();
     }
 

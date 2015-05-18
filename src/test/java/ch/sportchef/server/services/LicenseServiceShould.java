@@ -7,7 +7,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import javax.ws.rs.NotFoundException;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static io.dropwizard.testing.FixtureHelpers.fixture;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -35,5 +39,17 @@ public class LicenseServiceShould {
     public void returnLicense() throws IOException {
         final License license = licenseService.readLicense();
         assertThat(license).isEqualTo(agpl);
+    }
+
+    @Test(expected = NotFoundException.class)
+    public void returnLicenseNotFound() throws IOException {
+        final Path originalLicenseFile = Paths.get("LICENSE.md");
+        final Path movedLicenseFile = Paths.get("LICENSE.md.moved");
+        try {
+            Files.move(originalLicenseFile, movedLicenseFile);
+            licenseService.readLicense();
+        } finally {
+            Files.move(movedLicenseFile, originalLicenseFile);
+        }
     }
 }

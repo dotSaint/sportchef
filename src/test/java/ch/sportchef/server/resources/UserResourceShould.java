@@ -17,10 +17,12 @@ import javax.management.ServiceNotFoundException;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.sql.SQLException;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -42,9 +44,28 @@ public class UserResourceShould {
     private static User joyDoe = null;
 
     @Test
+    public void returnAllUsers() {
+        final WebTarget target = ClientBuilder.newClient().target(
+                String.format("http://localhost:%d/api/users", RULE.getLocalPort()));
+
+        final Response response = target
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .accept(MediaType.APPLICATION_JSON_TYPE)
+                .get();
+
+        assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
+
+        final List<User> users = response.readEntity(new GenericType<List<User>>() {});
+        assertThat(users.size()).isEqualTo(3);
+        assertThat(users.get(0)).isEqualTo(johnDoe);
+        assertThat(users.get(1)).isEqualTo(janeDoe);
+        assertThat(users.get(2)).isEqualTo(joyDoe);
+    }
+
+    @Test
     public void returnJohnDoe() {
         final WebTarget target = ClientBuilder.newClient().target(
-                String.format("http://localhost:%d/api/user/1", RULE.getLocalPort()));
+                String.format("http://localhost:%d/api/users/1", RULE.getLocalPort()));
 
         final Response response = target
                 .request(MediaType.APPLICATION_JSON_TYPE)
@@ -60,7 +81,7 @@ public class UserResourceShould {
     @Test
     public void returnJaneDoe() {
         final WebTarget target = ClientBuilder.newClient().target(
-                String.format("http://localhost:%d/api/user/2", RULE.getLocalPort()));
+                String.format("http://localhost:%d/api/users/2", RULE.getLocalPort()));
 
         final Response response = target
                 .request(MediaType.APPLICATION_JSON_TYPE)
@@ -76,7 +97,7 @@ public class UserResourceShould {
     @Test
     public void returnNotFound() {
         final WebTarget target = ClientBuilder.newClient().target(
-                String.format("http://localhost:%d/api/user/0", RULE.getLocalPort()));
+                String.format("http://localhost:%d/api/users/0", RULE.getLocalPort()));
 
         final Response response = target
                 .request(MediaType.APPLICATION_JSON_TYPE)
@@ -89,7 +110,7 @@ public class UserResourceShould {
     @Test
     public void createTheNewUserJimDoe() throws JsonProcessingException {
         final WebTarget target = ClientBuilder.newClient().target(
-                String.format("http://localhost:%d/api/user", RULE.getLocalPort()));
+                String.format("http://localhost:%d/api/users", RULE.getLocalPort()));
 
         final User user = UserGenerator.getJimDoe(0L);
 
@@ -111,7 +132,7 @@ public class UserResourceShould {
     @Test
     public void updateJoyDoe() {
         final WebTarget target = ClientBuilder.newClient().target(
-                String.format("http://localhost:%d/api/user/%d", RULE.getLocalPort(), joyDoe.getId()));
+                String.format("http://localhost:%d/api/users/%d", RULE.getLocalPort(), joyDoe.getUserId()));
 
         final Response response = target
                 .request(MediaType.APPLICATION_JSON_TYPE)
@@ -124,7 +145,7 @@ public class UserResourceShould {
     @Test
     public void notUpdateJoyDoe() {
         final WebTarget target = ClientBuilder.newClient().target(
-                String.format("http://localhost:%d/api/user/%d", RULE.getLocalPort(), janeDoe.getId()));
+                String.format("http://localhost:%d/api/users/%d", RULE.getLocalPort(), janeDoe.getUserId()));
 
         final Response response = target
                 .request(MediaType.APPLICATION_JSON_TYPE)
@@ -132,5 +153,20 @@ public class UserResourceShould {
                 .put(Entity.json(joyDoe));
 
         assertThat(response.getStatus()).isEqualTo(Response.Status.BAD_REQUEST.getStatusCode());
+    }
+
+    @Test
+    public void notCreateOnUpdateNonExistingUser() {
+        final User jackDoe = UserGenerator.getJackDoe(42);
+
+        final WebTarget target = ClientBuilder.newClient().target(
+                String.format("http://localhost:%d/api/users/%d", RULE.getLocalPort(), jackDoe.getUserId()));
+
+        final Response response = target
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .accept(MediaType.APPLICATION_JSON_TYPE)
+                .put(Entity.json(jackDoe));
+
+        assertThat(response.getStatus()).isEqualTo(Response.Status.NOT_FOUND.getStatusCode());
     }
 }
