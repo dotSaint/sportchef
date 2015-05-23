@@ -96,7 +96,7 @@ public class App extends Application<SportChefConfiguration> {
         final JsonWebTokenParser tokenParser = new DefaultJsonWebTokenParser();
         final HmacSHA512Verifier tokenVerifier = new HmacSHA512Verifier(tokenSecret);
         environment.jersey().register(AuthFactory.binder(new JWTAuthFactory<>(
-                new SportChefAuthenticator(new ExpiryValidator(), tokenSecret),
+                new SportChefAuthenticator(new ExpiryValidator()),
                 "realm", User.class, tokenVerifier, tokenParser)));
     }
 }

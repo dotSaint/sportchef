@@ -135,7 +135,6 @@ public class TokenResourceShould {
                 .accept(MediaType.APPLICATION_JSON_TYPE)
                 .get();
 
-        // TODO #84 Expired token should respond with 401 UNAUTHORIZED instead of INTERNAL_SERVER_ERROR
-        assertThat(response.getStatus()).isEqualTo(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
+        assertThat(response.getStatus()).isEqualTo(Response.Status.UNAUTHORIZED.getStatusCode());
     }
 }

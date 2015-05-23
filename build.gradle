@@ -36,8 +36,8 @@ dependencies {
             'io.dropwizard:dropwizard-migrations:0.8.1',
             'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.5.3',
             'com.h2database:h2:1.4.187',
-            'com.github.toastshaman:dropwizard-auth-jwt:0.8.1-0',
-            'com.auth0:java-jwt:2.0.1',
+            'com.github.toastshaman:dropwizard-auth-jwt:0.8.1-1',
+            'com.auth0:java-jwt:2.1.0',
             'commons-codec:commons-codec:1.10'
     )
     testCompile (
