@@ -10,7 +10,7 @@ targetCompatibility = 1.8
 
 version = '0.1'
 
-mainClassName = 'ch.sportchef.server.App'
+mainClassName = 'ch.sportchef.server.SportChefApp'
 
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
@@ -61,7 +61,7 @@ buildscript {
 }
 
 task oneJar(type: OneJar) {
-    mainClass = 'ch.sportchef.server.App'
+    mainClass = 'ch.sportchef.server.SportChefApp'
     archiveName = 'sportchef-server-' + version + '.jar'
 }
 

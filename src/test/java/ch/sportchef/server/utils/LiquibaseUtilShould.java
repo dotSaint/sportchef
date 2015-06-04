@@ -1,7 +1,7 @@
 package ch.sportchef.server.utils;
 
-import ch.sportchef.server.configuration.SportChefConfiguration;
-import ch.sportchef.server.configuration.SportChefDataSourceFactory;
+import ch.sportchef.server.SportChefConfiguration;
+import ch.sportchef.server.SportChefDataSourceFactory;
 import com.codahale.metrics.MetricRegistry;
 import io.dropwizard.db.ManagedDataSource;
 import io.dropwizard.setup.Environment;

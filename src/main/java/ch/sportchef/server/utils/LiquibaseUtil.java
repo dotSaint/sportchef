@@ -1,6 +1,6 @@
 package ch.sportchef.server.utils;
 
-import ch.sportchef.server.configuration.SportChefConfiguration;
+import ch.sportchef.server.SportChefConfiguration;
 import io.dropwizard.db.ManagedDataSource;
 import io.dropwizard.setup.Environment;
 import liquibase.Liquibase;

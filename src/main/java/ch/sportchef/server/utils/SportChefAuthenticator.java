@@ -1,8 +1,7 @@
 package ch.sportchef.server.utils;
 
-import ch.sportchef.server.representations.User;
-import ch.sportchef.server.services.ServiceRegistry;
-import ch.sportchef.server.services.UserService;
+import ch.sportchef.server.user.User;
+import ch.sportchef.server.user.UserService;
 import com.github.toastshaman.dropwizard.auth.jwt.JsonWebTokenValidator;
 import com.github.toastshaman.dropwizard.auth.jwt.model.JsonWebToken;
 import com.google.common.base.Optional;
